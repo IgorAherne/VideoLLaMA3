@@ -18,6 +18,9 @@ import math
 from abc import ABC, abstractmethod
 from typing import List, Optional, Tuple, Union
 
+import logging
+logger = logging.getLogger(__name__)
+
 import einops
 import torch
 import torch.distributed as dist
@@ -140,17 +143,101 @@ class Videollama3MetaForCausalLM(ABC):
 
     def encode_images(
         self,
-        pixel_values: torch.FloatTensor,
-        grid_sizes: torch.LongTensor,
-        merge_sizes: torch.LongTensor,
+        pixel_values: torch.FloatTensor,    # Shape: (SUM_OF_ALL_PATCHES_IN_BATCH, patch_feature_dim)
+        grid_sizes: torch.LongTensor,       # Shape: (B, 3), where B is num visual inputs, each row (t_frames, h_grid, w_grid)
+        merge_sizes: torch.LongTensor,      # Shape: (B)
+        vision_chunk_size: Optional[int] = None, # New parameter
     ) -> torch.FloatTensor:
-        mm_features = self.get_model().get_vision_encoder()(
-            pixel_values=pixel_values,
-            grid_sizes=grid_sizes,
-            merge_sizes=merge_sizes,
-        )
-        mm_features = self.get_model().mm_projector(mm_features)
-        return mm_features
+        
+        all_projected_features_for_batch_items = [] # To store final features for each item in the batch
+
+        # num_patches_per_item[i] = t_i * h_grid_i * w_grid_i
+        # This is the number of patches *before* any merging/pooling by the vision encoder's final stages.
+        num_patches_per_item = grid_sizes.prod(dim=1) 
+        
+        patch_offsets = torch.zeros(num_patches_per_item.size(0) + 1, dtype=torch.long, device=pixel_values.device)
+        patch_offsets[1:] = num_patches_per_item.cumsum(0)
+
+        # Iterate over each visual input in the batch
+        for i in range(grid_sizes.size(0)): # grid_sizes.size(0) is B (batch size of visual inputs)
+            # Get patches for the current item
+            item_pixel_values = pixel_values[patch_offsets[i] : patch_offsets[i+1]]
+            # Get grid and merge sizes for the current item (retain batch dim of 1 for encoder/projector calls)
+            item_grid_sizes = grid_sizes[i:i+1]    # Shape: (1, 3)
+            item_merge_sizes = merge_sizes[i:i+1]  # Shape: (1)
+
+            T_total_frames = item_grid_sizes[0, 0].item()
+            H_grid = item_grid_sizes[0, 1].item()
+            W_grid = item_grid_sizes[0, 2].item()
+            patches_per_frame = H_grid * W_grid
+
+            # To store features from processed chunks of the current item
+            item_projected_features_list_of_chunks = []
+
+            # Determine if chunking should be applied for this item
+            use_chunking_for_this_item = (
+                T_total_frames > 1 # Only chunk if it's a video with multiple frames
+                and vision_chunk_size is not None 
+                and vision_chunk_size > 0 
+                and vision_chunk_size < T_total_frames
+            )
+
+            if not use_chunking_for_this_item:
+                logger.debug(f"Item {i}: Processing all {T_total_frames} frames at once.")
+                # Process all frames of this item at once
+                encoded_features = self.get_model().get_vision_encoder()(
+                    pixel_values=item_pixel_values,
+                    grid_sizes=item_grid_sizes,
+                    merge_sizes=item_merge_sizes,
+                )
+                projected_features = self.get_model().mm_projector(encoded_features)
+                item_projected_features_list_of_chunks.append(projected_features)
+            else:
+                logger.debug(f"Item {i}: Processing {T_total_frames} frames in chunks of size {vision_chunk_size}.")
+                # Process in chunks for this item
+                for frame_chunk_start_idx_in_item in range(0, T_total_frames, vision_chunk_size):
+                    frame_chunk_end_idx_in_item = min(frame_chunk_start_idx_in_item + vision_chunk_size, T_total_frames)
+                    num_frames_in_current_chunk = frame_chunk_end_idx_in_item - frame_chunk_start_idx_in_item
+
+                    # Determine patch indices for the current chunk of frames
+                    patch_chunk_start_idx = frame_chunk_start_idx_in_item * patches_per_frame
+                    patch_chunk_end_idx = frame_chunk_end_idx_in_item * patches_per_frame
+                    
+                    pixel_values_for_chunk = item_pixel_values[patch_chunk_start_idx : patch_chunk_end_idx]
+                    
+                    # grid_sizes for this chunk needs to reflect the number of frames in *this* chunk
+                    grid_sizes_for_chunk = torch.tensor(
+                        [[num_frames_in_current_chunk, H_grid, W_grid]], 
+                        device=item_grid_sizes.device, 
+                        dtype=item_grid_sizes.dtype
+                    )
+                    # item_merge_sizes is already (1), and applies to the whole item processing logic
+                    # within the vision encoder which expects it per-item.
+
+                    logger.debug(f"  Item {i}, Chunk: {frame_chunk_start_idx_in_item // vision_chunk_size + 1}, Frames in chunk: {num_frames_in_current_chunk}")
+
+                    encoded_chunk_features = self.get_model().get_vision_encoder()(
+                        pixel_values=pixel_values_for_chunk,
+                        grid_sizes=grid_sizes_for_chunk,
+                        merge_sizes=item_merge_sizes, 
+                    )
+                    projected_chunk_features = self.get_model().mm_projector(encoded_chunk_features)
+                    item_projected_features_list_of_chunks.append(projected_chunk_features)
+                    
+                    # Optional: Aggressive VRAM cleanup if needed, can add latency
+                    # del pixel_values_for_chunk, grid_sizes_for_chunk, encoded_chunk_features, projected_chunk_features
+                    # if torch.cuda.is_available(): torch.cuda.empty_cache()
+                    # import gc; gc.collect()
+            
+            # Concatenate features from all chunks for the current item
+            # Each chunk's projected_features has shape (num_patches_in_chunk_after_merge, llm_hidden_size)
+            concatenated_features_for_item = torch.cat(item_projected_features_list_of_chunks, dim=0)
+            all_projected_features_for_batch_items.append(concatenated_features_for_item)
+
+        # Concatenate features from all items in the batch
+        # Final mm_features should have shape (TOTAL_PATCHES_IN_BATCH_AFTER_MERGE_AND_PROJECTION, llm_hidden_size)
+        final_mm_features = torch.cat(all_projected_features_for_batch_items, dim=0)
+        return final_mm_features
 
     def _get_valid_visual_tokens(
         self,
@@ -278,6 +365,7 @@ class Videollama3MetaForCausalLM(ABC):
         grid_sizes: Optional[torch.LongTensor] = None,
         merge_sizes: Optional[torch.LongTensor] = None,
         modals: Optional[List[str]] = None,
+        vision_chunk_size: Optional[int] = None,
     ):
         vision_encoder = self.get_vision_encoder()
         # NOTE: text-only situation
@@ -296,7 +384,7 @@ class Videollama3MetaForCausalLM(ABC):
 
         # 2. embed visual tokens
         batched_num_patches = grid_sizes.prod(dim=1).div(merge_sizes ** 2).long()
-        mm_features = self.encode_images(pixel_values, grid_sizes, merge_sizes).to(input_ids.device)
+        mm_features = self.encode_images(pixel_values, grid_sizes, merge_sizes, vision_chunk_size=vision_chunk_size).to(input_ids.device)
         mm_features = self._get_valid_visual_tokens(mm_features, batched_num_patches, modals)
 
         compression_mask = self._get_compression_mask(

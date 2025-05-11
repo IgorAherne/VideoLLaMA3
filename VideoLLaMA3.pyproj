@@ -12,6 +12,9 @@
     <OutputPath>.</OutputPath>
     <Name>VideoLLaMA3</Name>
     <RootNamespace>VideoLLaMA3</RootNamespace>
+    <SuppressEnvironmentCreationPrompt>True</SuppressEnvironmentCreationPrompt>
+    <SuppressConfigureTestFrameworkPrompt>true</SuppressConfigureTestFrameworkPrompt>
+    <InterpreterId>MSBuild|venv|C:\_myDrive\repos\auto-vlog\AutoVlogProj\AutoVlogProj.pyproj</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -208,6 +211,9 @@
     <Compile Include="videollama3\train.py" />
     <Compile Include="videollama3\videollama3_trainer.py" />
     <Compile Include="videollama3\__init__.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="MSBuild|venv|C:\_myDrive\repos\auto-vlog\AutoVlogProj\AutoVlogProj.pyproj" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
