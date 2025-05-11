@@ -1,0 +1,221 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>55ef355b-7de6-417d-a83f-a906d5964206</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <StartupFile>
+    </StartupFile>
+    <SearchPath>
+    </SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <Name>VideoLLaMA3</Name>
+    <RootNamespace>VideoLLaMA3</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="assets\cat_and_chicken.mp4" />
+    <Content Include="assets\desert.jpg" />
+    <Content Include="assets\logo.png" />
+    <Content Include="assets\performance.png" />
+    <Content Include="assets\pipeline.jpg" />
+    <Content Include="assets\results_image_2b.png" />
+    <Content Include="assets\results_image_7b.png" />
+    <Content Include="assets\results_video_2b.png" />
+    <Content Include="assets\results_video_7b.png" />
+    <Content Include="assets\sora.png" />
+    <Content Include="evaluation\image\MMMU-Pro\prompts.yaml" />
+    <Content Include="evaluation\image\MMMU\config_file.yaml" />
+    <Content Include="inference\notebooks\01_single_image_understanding.ipynb" />
+    <Content Include="inference\notebooks\02_multi_image_understanding.ipynb" />
+    <Content Include="inference\notebooks\03_visual_referring_and_grounding.ipynb" />
+    <Content Include="inference\notebooks\04_video_understanding.ipynb" />
+    <Content Include="inference\notebooks\visuals\algorithm.jpg" />
+    <Content Include="inference\notebooks\visuals\basketball.mp4" />
+    <Content Include="inference\notebooks\visuals\cars.jpg" />
+    <Content Include="inference\notebooks\visuals\cat.jpg" />
+    <Content Include="inference\notebooks\visuals\chart.jpg" />
+    <Content Include="inference\notebooks\visuals\city1.jpg" />
+    <Content Include="inference\notebooks\visuals\city2.jpg" />
+    <Content Include="inference\notebooks\visuals\cola.mp4" />
+    <Content Include="inference\notebooks\visuals\doc.jpg" />
+    <Content Include="inference\notebooks\visuals\long.mp4" />
+    <Content Include="inference\notebooks\visuals\math.jpg" />
+    <Content Include="inference\notebooks\visuals\table.jpg" />
+    <Content Include="README.md" />
+    <Content Include="scripts\eval\eval_image.sh" />
+    <Content Include="scripts\eval\eval_video.sh" />
+    <Content Include="scripts\train\stage1_2b.sh" />
+    <Content Include="scripts\train\stage2_2b.sh" />
+    <Content Include="scripts\train\stage3_2b.sh" />
+    <Content Include="scripts\train\stage4_2b.sh" />
+    <Content Include="scripts\zero1.json" />
+    <Content Include="scripts\zero2.json" />
+    <Content Include="scripts\zero3.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="assets\" />
+    <Folder Include="evaluation\" />
+    <Folder Include="evaluation\benchmarks\" />
+    <Folder Include="evaluation\image\" />
+    <Folder Include="evaluation\image\AI2D\" />
+    <Folder Include="evaluation\image\BLINK\" />
+    <Folder Include="evaluation\image\ChartQA\" />
+    <Folder Include="evaluation\image\DocVQA\" />
+    <Folder Include="evaluation\image\GQA\" />
+    <Folder Include="evaluation\image\InfoVQA\" />
+    <Folder Include="evaluation\image\MathVista\" />
+    <Folder Include="evaluation\image\MME\" />
+    <Folder Include="evaluation\image\MMMU-Pro\" />
+    <Folder Include="evaluation\image\MMMU\" />
+    <Folder Include="evaluation\image\OCRBench\" />
+    <Folder Include="evaluation\image\RealWorldQA\" />
+    <Folder Include="evaluation\video\" />
+    <Folder Include="evaluation\video\cap_msvc\" />
+    <Folder Include="evaluation\video\mcqa\" />
+    <Folder Include="evaluation\video\video_oqa\" />
+    <Folder Include="inference\" />
+    <Folder Include="inference\interface\" />
+    <Folder Include="inference\notebooks\" />
+    <Folder Include="inference\notebooks\visuals\" />
+    <Folder Include="inference\server\" />
+    <Folder Include="inference\transformers_api\" />
+    <Folder Include="scripts\" />
+    <Folder Include="scripts\eval\" />
+    <Folder Include="scripts\train\" />
+    <Folder Include="videollama3\" />
+    <Folder Include="videollama3\model\" />
+    <Folder Include="videollama3\model\videollama3_encoder\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="evaluation\benchmarks\activitynet_qa.py" />
+    <Compile Include="evaluation\benchmarks\ai2d.py" />
+    <Compile Include="evaluation\benchmarks\base.py" />
+    <Compile Include="evaluation\benchmarks\blink.py" />
+    <Compile Include="evaluation\benchmarks\charades_sta.py" />
+    <Compile Include="evaluation\benchmarks\chartqa.py" />
+    <Compile Include="evaluation\benchmarks\docvqa.py" />
+    <Compile Include="evaluation\benchmarks\egoschema.py" />
+    <Compile Include="evaluation\benchmarks\gqa.py" />
+    <Compile Include="evaluation\benchmarks\infovqa.py" />
+    <Compile Include="evaluation\benchmarks\longvideobench.py" />
+    <Compile Include="evaluation\benchmarks\lvbench.py" />
+    <Compile Include="evaluation\benchmarks\mathverse.py" />
+    <Compile Include="evaluation\benchmarks\mathvision.py" />
+    <Compile Include="evaluation\benchmarks\mathvista.py" />
+    <Compile Include="evaluation\benchmarks\mlvu.py" />
+    <Compile Include="evaluation\benchmarks\mme.py" />
+    <Compile Include="evaluation\benchmarks\mmmu.py" />
+    <Compile Include="evaluation\benchmarks\mmmupro.py" />
+    <Compile Include="evaluation\benchmarks\mmvu.py" />
+    <Compile Include="evaluation\benchmarks\mvbench.py" />
+    <Compile Include="evaluation\benchmarks\nextqa.py" />
+    <Compile Include="evaluation\benchmarks\ocrbench.py" />
+    <Compile Include="evaluation\benchmarks\perception_test.py" />
+    <Compile Include="evaluation\benchmarks\realworldqa.py" />
+    <Compile Include="evaluation\benchmarks\tempcompass.py" />
+    <Compile Include="evaluation\benchmarks\videomme.py" />
+    <Compile Include="evaluation\benchmarks\__init__.py" />
+    <Compile Include="evaluation\evaluate.py" />
+    <Compile Include="evaluation\image\AI2D\evaluate_image_AI2D.py" />
+    <Compile Include="evaluation\image\AI2D\inference_image_AI2D.py" />
+    <Compile Include="evaluation\image\BLINK\evaluate_image_BLINK.py" />
+    <Compile Include="evaluation\image\BLINK\inference_image_BLINK.py" />
+    <Compile Include="evaluation\image\BLINK\multiple_choice.py" />
+    <Compile Include="evaluation\image\ChartQA\evaluate_image_ChartQA.py" />
+    <Compile Include="evaluation\image\ChartQA\inference_image_ChartQA.py" />
+    <Compile Include="evaluation\image\DocVQA\convert_json.py" />
+    <Compile Include="evaluation\image\DocVQA\evaluate_image_DocVQA.py" />
+    <Compile Include="evaluation\image\DocVQA\inference_image_DocVQA.py" />
+    <Compile Include="evaluation\image\GQA\evaluate_image_GQA.py" />
+    <Compile Include="evaluation\image\GQA\inference_image_GQA.py" />
+    <Compile Include="evaluation\image\InfoVQA\convert_json.py" />
+    <Compile Include="evaluation\image\InfoVQA\evaluate_image_InfoVQA.py" />
+    <Compile Include="evaluation\image\InfoVQA\inference_image_InfoVQA.py" />
+    <Compile Include="evaluation\image\MathVista\evaluate_image_MathVista.py" />
+    <Compile Include="evaluation\image\MathVista\ext_ans.py" />
+    <Compile Include="evaluation\image\MathVista\inference_image_MathVista.py" />
+    <Compile Include="evaluation\image\MME\evaluate_image_MME.py" />
+    <Compile Include="evaluation\image\MME\inference_image_MME.py" />
+    <Compile Include="evaluation\image\MMMU-Pro\evaluate_image_MMMU_Pro.py" />
+    <Compile Include="evaluation\image\MMMU-Pro\inference_image_MMMU_Pro.py" />
+    <Compile Include="evaluation\image\MMMU\data_utils.py" />
+    <Compile Include="evaluation\image\MMMU\evaluate_image_MMMU.py" />
+    <Compile Include="evaluation\image\MMMU\eval_utils.py" />
+    <Compile Include="evaluation\image\MMMU\inference_image_MMMU.py" />
+    <Compile Include="evaluation\image\OCRBench\evaluate_image_OCRBench.py" />
+    <Compile Include="evaluation\image\OCRBench\inference_image_OCRBench.py" />
+    <Compile Include="evaluation\image\RealWorldQA\evaluate_image_RealWorldQA.py" />
+    <Compile Include="evaluation\image\RealWorldQA\inference_image_RealWorldQA.py" />
+    <Compile Include="evaluation\register.py" />
+    <Compile Include="evaluation\utils.py" />
+    <Compile Include="evaluation\video\cap_msvc\eval_video_cap_msvc_correctness.py" />
+    <Compile Include="evaluation\video\cap_msvc\eval_video_cap_msvc_detailedness.py" />
+    <Compile Include="evaluation\video\cap_msvc\inference_video_cap_msvc.py" />
+    <Compile Include="evaluation\video\mcqa\eval_video_mcqa_mlvu.py" />
+    <Compile Include="evaluation\video\mcqa\eval_video_mcqa_mvbench.py" />
+    <Compile Include="evaluation\video\mcqa\eval_video_mcqa_videomme.py" />
+    <Compile Include="evaluation\video\mcqa\inference_video_mcqa_egoschema.py" />
+    <Compile Include="evaluation\video\mcqa\inference_video_mcqa_longvideobench.py" />
+    <Compile Include="evaluation\video\mcqa\inference_video_mcqa_mlvu.py" />
+    <Compile Include="evaluation\video\mcqa\inference_video_mcqa_mvbench.py" />
+    <Compile Include="evaluation\video\mcqa\inference_video_mcqa_perception_test_mcqa.py" />
+    <Compile Include="evaluation\video\mcqa\inference_video_mcqa_videomme.py" />
+    <Compile Include="evaluation\video\video_oqa\eval_video_oqa_activitynet.py" />
+    <Compile Include="evaluation\video\video_oqa\eval_video_oqa_vcgpt_1_correctness.py" />
+    <Compile Include="evaluation\video\video_oqa\eval_video_oqa_vcgpt_2_detailed_orientation.py" />
+    <Compile Include="evaluation\video\video_oqa\eval_video_oqa_vcgpt_3_context.py" />
+    <Compile Include="evaluation\video\video_oqa\eval_video_oqa_vcgpt_4_temporal.py" />
+    <Compile Include="evaluation\video\video_oqa\eval_video_oqa_vcgpt_5_consistency.py" />
+    <Compile Include="evaluation\video\video_oqa\inference_video_oqa_activitynet.py" />
+    <Compile Include="evaluation\video\video_oqa\inference_video_oqa_vcgpt_consistency.py" />
+    <Compile Include="evaluation\video\video_oqa\inference_video_oqa_vcgpt_general.py" />
+    <Compile Include="inference\example_videollama3.py" />
+    <Compile Include="inference\interface\gradio_interface.py" />
+    <Compile Include="inference\interface\__init__.py" />
+    <Compile Include="inference\launch_gradio_demo.py" />
+    <Compile Include="inference\server\plain_server.py" />
+    <Compile Include="inference\server\__init__.py" />
+    <Compile Include="inference\transformers_api\configuration_videollama3.py" />
+    <Compile Include="inference\transformers_api\configuration_videollama3_encoder.py" />
+    <Compile Include="inference\transformers_api\image_processing_videollama3.py" />
+    <Compile Include="inference\transformers_api\modeling_videollama3.py" />
+    <Compile Include="inference\transformers_api\modeling_videollama3_encoder.py" />
+    <Compile Include="inference\transformers_api\processing_videollama3.py" />
+    <Compile Include="inference\transformers_api\__init__.py" />
+    <Compile Include="scripts\convert_hf_checkpoint.py" />
+    <Compile Include="videollama3\constants.py" />
+    <Compile Include="videollama3\infer.py" />
+    <Compile Include="videollama3\mm_utils.py" />
+    <Compile Include="videollama3\model\encoder.py" />
+    <Compile Include="videollama3\model\processor.py" />
+    <Compile Include="videollama3\model\projector.py" />
+    <Compile Include="videollama3\model\videollama3_arch.py" />
+    <Compile Include="videollama3\model\videollama3_encoder\configuration_videollama3_encoder.py" />
+    <Compile Include="videollama3\model\videollama3_encoder\image_processing_videollama3.py" />
+    <Compile Include="videollama3\model\videollama3_encoder\modeling_videollama3_encoder.py" />
+    <Compile Include="videollama3\model\videollama3_encoder\__init__.py" />
+    <Compile Include="videollama3\model\videollama3_qwen2.py" />
+    <Compile Include="videollama3\model\__init__.py" />
+    <Compile Include="videollama3\train.py" />
+    <Compile Include="videollama3\videollama3_trainer.py" />
+    <Compile Include="videollama3\__init__.py" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+  <!-- Uncomment the CoreCompile target to enable the Build command in
+       Visual Studio and specify your pre- and post-build commands in
+       the BeforeBuild and AfterBuild targets below. -->
+  <!--<Target Name="CoreCompile" />-->
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+</Project>
